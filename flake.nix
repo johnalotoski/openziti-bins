@@ -75,7 +75,7 @@
 
           installPhase = ''
             install -m755 -d $out/bin/
-            install -m755 -D ziti/* $out/bin/
+            install -m755 -D ziti/ziti $out/bin/
           '';
 
           postAutoPatchelf = ''
@@ -85,6 +85,29 @@
               --zsh <($out/bin/ziti completion zsh)
               # No support for powershell in installShellCompletion
               # --powershell <($out/bin/ziti completion powershell)
+          '';
+
+          meta = with lib; {
+            homepage = "https://github.com/openziti/ziti";
+            description = "The parent project for OpenZiti. Here you will find the executables for a fully zero trust, application embedded, programmable network";
+            license = licenses.asl20;
+            platforms = platforms.linux;
+          };
+        };
+      };
+
+      mkZitiBinTypePkg = version: binType: {
+        "ziti-${binType}_${sanitize version}" = stdenv.mkDerivation rec {
+          inherit version;
+          name = "ziti-${binType}-${version}";
+
+          src = srcBinZiti version hashes.srcBinZiti.${version};
+          sourceRoot = ".";
+          nativeBuildInputs = [autoPatchelfHook];
+
+          installPhase = ''
+            install -m755 -d $out/bin/
+            install -m755 -D ziti/ziti-${binType} $out/bin/
           '';
 
           meta = with lib; {
@@ -165,11 +188,15 @@
       };
 
       mkZitiPkgs = lib.foldl (acc: v: acc // (mkZitiPkg v)) {} (builtins.attrNames hashes.srcBinZiti);
+      mkZitiBinTypePkgs = binType: lib.foldl (acc: v: acc // (mkZitiBinTypePkg v binType)) {} (builtins.attrNames hashes.srcZiti);
       mkZitiCliFnPkgs = lib.foldl (acc: v: acc // (mkZitiCliFnPkg v)) {} (builtins.attrNames hashes.srcZiti);
       mkZitiEdgeTunnelPkgs = lib.foldl (acc: v: acc // (mkZitiEdgeTunnelPkg v)) {} (builtins.attrNames hashes.srcBinZitiEdgeTunnel);
 
     in lib.pipe {} [
       (lib.recursiveUpdate mkZitiPkgs)
+      (lib.recursiveUpdate (mkZitiBinTypePkgs "controller"))
+      (lib.recursiveUpdate (mkZitiBinTypePkgs "router"))
+      (lib.recursiveUpdate (mkZitiBinTypePkgs "tunnel"))
       (lib.recursiveUpdate mkZitiCliFnPkgs)
       (lib.recursiveUpdate mkZitiConsole)
       (lib.recursiveUpdate mkZitiEdgeTunnelPkgs)
