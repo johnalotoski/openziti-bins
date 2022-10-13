@@ -1,5 +1,41 @@
 {
   "nodes": {
+    "flake-utils": {
+      "locked": {
+        "lastModified": 1659877975,
+        "narHash": "sha256-zllb8aq3YO3h8B/U0/J1WBgAL8EX5yWf5pMj3G0NAmc=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "c0e246b9b83f637f4681389ecabcb2681b4f3af0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "napalm": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1665439851,
+        "narHash": "sha256-ezMpWttCJIyNIdC/MAu7ese5FXwRI4STR86AtfcHitk=",
+        "owner": "nix-community",
+        "repo": "napalm",
+        "rev": "f9b0ab8b71f8566d492450591f0422a9ec47710c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "napalm",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1665003617,
@@ -17,7 +53,25 @@
     },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "napalm": "napalm",
+        "nixpkgs": "nixpkgs",
+        "zitiConsole": "zitiConsole"
+      }
+    },
+    "zitiConsole": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1664801756,
+        "narHash": "sha256-GPiVECt7+zHkIb1KgnqJCjeHoAqG7RAyv+l57laHYiU=",
+        "owner": "openziti",
+        "repo": "ziti-console",
+        "rev": "f289bb36b8ad2910e63c28bb26e8e30179a62de6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "openziti",
+        "repo": "ziti-console",
+        "type": "github"
       }
     }
   },
