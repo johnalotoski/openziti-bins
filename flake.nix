@@ -95,7 +95,7 @@
     };
   in
     with pkgs; rec {
-      defaultPackage.x86_64-linux = ziti-edge-tunnel_latest.x86_64-linux;
+      defaultPackage.x86_64-linux = packages.x86_64-linux.ziti-edge-tunnel_latest;
 
       packages.x86_64-linux = let
         mkZitiPkg = v: {
