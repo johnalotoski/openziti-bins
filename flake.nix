@@ -4,6 +4,16 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
 
+    flake-compat = {
+      url = "github:edolstra/flake-compat";
+      flake = false;
+    };
+
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     napalm = {
       url = "github:nix-community/napalm";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -18,15 +28,18 @@
   outputs = {
     self,
     nixpkgs,
+    flake-compat,
+    flake-parts,
     napalm,
     zitiConsole,
-  }: let
+  }:
+  flake-parts.lib.mkFlake { inherit self; } {
+    systems = ["x86_64-linux"];
+    perSystem = { inputs', pkgs, system, ... }:
+
+    let
     inherit (builtins) attrNames;
     inherit (pkgs.lib) fakeSha256 foldl licenses pipe platforms recursiveUpdate;
-
-    pkgs = import nixpkgs {
-      system = "x86_64-linux";
-    };
 
     srcZiti = version: sha256:
       pkgs.fetchFromGitHub {
@@ -116,11 +129,22 @@
         };
       };
     };
-  in
-    with pkgs; rec {
-      defaultPackage.x86_64-linux = packages.x86_64-linux.ziti-edge-tunnel_latest;
+  in with pkgs; rec {
 
-      packages.x86_64-linux = let
+      devShells.default = mkShell {
+        buildInputs = with packages; [
+          ziti-cli-functions_latest
+          ziti-controller_latest
+          ziti-edge-tunnel_latest
+          ziti_latest
+          ziti-router_latest
+          ziti-tunnel_latest
+        ];
+      };
+
+      legacyPackages = packages;
+
+      packages = let
         mkZitiPkg = v: {
           "ziti_${v}" = stdenv.mkDerivation rec {
             inherit (state.srcBinZiti.${v}) version;
@@ -211,7 +235,7 @@
 
         mkZitiConsole = {
           ziti-console = let
-            napalmPackage = napalm.legacyPackages.x86_64-linux.buildPackage zitiConsole.outPath {};
+            napalmPackage = inputs'.napalm.legacyPackages.buildPackage zitiConsole.outPath {};
           in
             stdenv.mkDerivation rec {
               name = napalmPackage.name;
@@ -264,6 +288,8 @@
           (recursiveUpdate mkZitiCliFnPkgs)
           (recursiveUpdate mkZitiConsole)
           (recursiveUpdate mkZitiEdgeTunnelPkgs)
+          (recursiveUpdate { default = packages.ziti-edge-tunnel_latest; })
         ];
     };
+  };
 }
