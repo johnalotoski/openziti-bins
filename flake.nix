@@ -104,7 +104,12 @@
           };
 
           srcBinZitiEdgeTunnel = rec {
-            latest = let l = v0-20-2; in {inherit (l) version hash;};
+            latest = let l = v0-20-6; in {inherit (l) version hash;};
+
+            v0-20-6 = {
+              version = "0.20.6";
+              hash = "sha256-fyOJJ88DvRCVHNtlWt1eUJdH1XRAyeSgHeJTwxWM8e0=";
+            };
 
             # Working
             v0-20-2 = {
