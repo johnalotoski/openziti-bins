@@ -111,9 +111,9 @@ in
       };
     };
 
-    mkZitiConsole = {
+    mkZitiConsole = inputs': self: {
       ziti-console = let
-        napalmPackage = inputs'.napalm.legacyPackages.buildPackage zitiConsole.outPath {};
+        napalmPackage = inputs'.napalm.legacyPackages.buildPackage self.inputs.zitiConsole.outPath {};
       in
         stdenv.mkDerivation rec {
           name = napalmPackage.name;

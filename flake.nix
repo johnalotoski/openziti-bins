@@ -39,10 +39,10 @@
         ...
       }: let
         inherit (pkgs.lib) pipe recursiveUpdate;
+        inherit (zitiVersions) state;
 
         zitiLib = (import lib/lib.nix) pkgs;
         zitiVersions = (import ./versions.nix) pkgs;
-        inherit (zitiVersions) state;
       in
         with pkgs; rec {
           devShells.default = mkShell {
@@ -68,10 +68,20 @@
               (recursiveUpdate (mkZitiBinTypePkgs state "router"))
               (recursiveUpdate (mkZitiBinTypePkgs state "tunnel"))
               (recursiveUpdate (mkZitiCliFnPkgs state))
-              (recursiveUpdate mkZitiConsole)
+              (recursiveUpdate (mkZitiConsole inputs' self))
               (recursiveUpdate (mkZitiEdgeTunnelPkgs state))
               (recursiveUpdate {default = packages.ziti-edge-tunnel_latest;})
             ];
         };
+
+      flake = {
+        # darwinModules;
+        nixosModules = {
+          ziti-controller = import ./modules/ziti-controller.nix self;
+          ziti-console = import ./modules/ziti-console.nix self;
+          ziti-edge-tunnel = import ./modules/ziti-edge-tunnel.nix self;
+          ziti-router = import ./modules/ziti-router.nix self;
+        };
+      };
     };
 }
