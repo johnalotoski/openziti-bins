@@ -1,0 +1,8 @@
+[formatter.nix]
+command = "alejandra"
+includes = ["*.nix"]
+
+[formatter.shell]
+command = "shfmt"
+options = ["-i","2","-w"]
+includes = ["*.sh"]
