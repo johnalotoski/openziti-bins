@@ -6,7 +6,7 @@ self: {
   ...
 }: let
   inherit (lib) mkIf mkOption;
-  inherit (lib.types) bool package;
+  inherit (lib.types) bool package port;
 
   cfg = config.services.ziti-console;
   ziti-console = cfg.package;
@@ -28,6 +28,22 @@ in {
         Defaults to `ziti-console`.
       '';
     };
+
+    portHttp = mkOption {
+      type = port;
+      default = 1408;
+      description = ''
+        The HTTP port ZAC uses.
+      '';
+    };
+
+    portHttps = mkOption {
+      type = port;
+      default = 8443;
+      description = ''
+        The HTTPS port ZAC uses.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -40,6 +56,9 @@ in {
       path = with pkgs; [nodejs];
 
       environment = {
+        PORT = toString cfg.portHttp;
+        PORTTLS = toString cfg.portHttps;
+
         # Tmp workaround to share required creds for PoC -- use another mechanism; ex: vault
         ZAC_SERVER_CERT_CHAIN = "/var/lib/ziti-controller/pki/ziti-controller-intermediate/certs/ziti-controller-server.cert";
         ZAC_SERVER_KEY = "/var/lib/ziti-controller/pki/ziti-controller-intermediate/keys/ziti-controller-server.key";

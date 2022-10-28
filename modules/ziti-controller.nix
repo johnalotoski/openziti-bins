@@ -6,7 +6,7 @@ self: {
   ...
 }: let
   inherit (lib) mkIf mkOption;
-  inherit (lib.types) bool package str;
+  inherit (lib.types) bool package port str;
 
   zitiController = "ziti-controller";
   zitiControllerHome = "/var/lib/${zitiController}";
@@ -29,7 +29,7 @@ self: {
       key = "${zitiControllerHome}/pki/${zitiExternalHostname}-intermediate/keys/${zitiExternalHostname}-server.key";
       ca = "${zitiControllerHome}/pki/cas.pem";
     };
-    ctrl.listener = "tls:0.0.0.0:6262";
+    ctrl.listener = "tls:0.0.0.0:${toString cfg.portManagementApi}";
     mgmt.listener = "tls:0.0.0.0:10000";
     healthChecks.boltCheck = {
       interval = "30s";
@@ -39,7 +39,7 @@ self: {
     edge = {
       api = {
         sessionTimeout = "30m";
-        address = "${zitiEdgeController}:1280";
+        address = "${zitiEdgeController}:${toString cfg.portRestApi}";
       };
       enrollment = {
         signingCert = {
@@ -55,8 +55,8 @@ self: {
         name = "client-management";
         bindPoints = [
           {
-            interface = "0.0.0.0:1280";
-            address = "${zitiEdgeController}:1280";
+            interface = "0.0.0.0:${toString cfg.portRestApi}";
+            address = "${zitiEdgeController}:${toString cfg.portRestApi}";
           }
         ];
         identity = {
@@ -159,6 +159,31 @@ in {
         Extra code which will be run at the end of the systemd ExecStartPost block.
       '';
     };
+
+    openFirewall = mkOption {
+      type = bool;
+      default = true;
+      description = ''
+        Whether to automatically open the TCP firewall ports for Ziti controller
+        port bindings.
+      '';
+    };
+
+    portManagementApi = mkOption {
+      type = port;
+      default = 6262;
+      description = ''
+        Ziti controller management API port binding.
+      '';
+    };
+
+    portRestApi = mkOption {
+      type = port;
+      default = 1280;
+      description = ''
+        Ziti controller REST API port binding.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -178,7 +203,10 @@ in {
     };
 
     # Required controller public ports
-    networking.firewall.allowedTCPPorts = [1280 6262];
+    networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [
+      cfg.portManagementApi
+      cfg.portRestApi
+    ];
 
     systemd.services.ziti-controller = {
       wantedBy = ["multi-user.target"];
@@ -192,7 +220,7 @@ in {
         ZITI_BIN_DIR = "${zitiControllerHome}/ziti-bin";
         ZITI_CONTROLLER_RAWNAME = zitiController;
         ZITI_EDGE_CONTROLLER_HOSTNAME = EXTERNAL_DNS;
-        ZITI_EDGE_CONTROLLER_PORT = "1280";
+        ZITI_EDGE_CONTROLLER_PORT = toString cfg.portRestApi;
         ZITI_EDGE_CONTROLLER_RAWNAME = zitiEdgeControllerRawName;
         ZITI_EDGE_ROUTER_HOSTNAME = EXTERNAL_DNS;
         ZITI_EDGE_ROUTER_PORT = "3022";

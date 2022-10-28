@@ -6,7 +6,7 @@ self: {
   ...
 }: let
   inherit (lib) mkIf mkOption;
-  inherit (lib.types) bool package str;
+  inherit (lib.types) bool package port str;
 
   zitiExternalHostname = "zt.${config.cluster.domain}";
   zitiController = "ziti-controller";
@@ -30,7 +30,7 @@ self: {
       ca = "${zitiRouterHome}/pki/routers/${zitiEdgeRouter}/cas.cert";
     };
     ctrl = {
-      endpoint = "tls:${zitiController}:6262";
+      endpoint = "tls:${zitiController}:${toString cfg.portManagementApi}";
     };
     link = {
       dialers = [
@@ -41,8 +41,8 @@ self: {
       listeners = [
         {
           binding = "transport";
-          bind = "tls:0.0.0.0:10080";
-          advertise = "tls:${zitiEdgeRouter}:10080";
+          bind = "tls:0.0.0.0:${toString cfg.portFabricLinks}";
+          advertise = "tls:${zitiEdgeRouter}:${toString cfg.portFabricLinks}";
           options = {
             outQueueSize = 4;
           };
@@ -52,9 +52,9 @@ self: {
     listeners = [
       {
         binding = "edge";
-        address = "tls:0.0.0.0:3022";
+        address = "tls:0.0.0.0:${toString cfg.portEdgeConnection}";
         options = {
-          advertise = "${zitiEdgeRouter}:3022";
+          advertise = "${zitiEdgeRouter}:${toString cfg.portEdgeConnection}";
           connectTimeoutMs = 1000;
           getSessionTimeout = "60s";
         };
@@ -174,6 +174,47 @@ in {
         Extra code which will be run at the end of the systemd ExecStartPost block.
       '';
     };
+
+    openFirewall = mkOption {
+      type = bool;
+      default = true;
+      description = ''
+        Whether to automatically open the TCP firewall ports for Ziti controller
+        port bindings.
+      '';
+    };
+
+    portEdgeConnection = mkOption {
+      type = port;
+      default = 3022;
+      description = ''
+        Ziti edge router connection port binding.
+      '';
+    };
+
+    portFabricLinks = mkOption {
+      type = port;
+      default = 10080;
+      description = ''
+        Ziti router fabric links port binding.
+      '';
+    };
+
+    portManagementApi = mkOption {
+      type = port;
+      default = 6262;
+      description = ''
+        Ziti controller management API port binding.
+      '';
+    };
+
+    portRestApi = mkOption {
+      type = port;
+      default = 1280;
+      description = ''
+        Ziti controller REST API port binding.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -195,7 +236,10 @@ in {
     };
 
     # Required edge router public ports
-    networking.firewall.allowedTCPPorts = [3022 10080];
+    networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [
+      cfg.portEdgeConnection
+      cfg.portFabricLinks
+    ];
 
     systemd.services.ziti-router = {
       wantedBy = ["multi-user.target"];
@@ -210,10 +254,10 @@ in {
         ZITI_CONTROLLER_INTERMEDIATE_NAME = "${zitiController}-intermediate";
         ZITI_CONTROLLER_RAWNAME = zitiController;
         ZITI_EDGE_CONTROLLER_HOSTNAME = EXTERNAL_DNS;
-        ZITI_EDGE_CONTROLLER_PORT = "1280";
+        ZITI_EDGE_CONTROLLER_PORT = toString cfg.portRestApi;
         ZITI_EDGE_CONTROLLER_RAWNAME = zitiEdgeController;
         ZITI_EDGE_ROUTER_HOSTNAME = EXTERNAL_DNS;
-        ZITI_EDGE_ROUTER_PORT = "3022";
+        ZITI_EDGE_ROUTER_PORT = toString cfg.portEdgeConnection;
         ZITI_EDGE_ROUTER_RAWNAME = zitiEdgeRouterRawName;
         ZITI_EDGE_ROUTER_ROLES = "public";
         ZITI_HOME = zitiRouterHome;
@@ -279,8 +323,8 @@ in {
                 done
 
                 # Ensure the controller is healthy
-                while [[ "$(curl -w "%{http_code}" -m 1 -s -k -o /dev/null https://${zitiEdgeController}:1280/version)" != "200" ]]; do
-                  echo "waiting for https://${zitiEdgeController}:1280"
+                while [[ "$(curl -w "%{http_code}" -m 1 -s -k -o /dev/null https://${zitiEdgeController}:${toString cfg.portRestApi}/version)" != "200" ]]; do
+                  echo "waiting for https://${zitiEdgeController}:${toString cfg.portRestApi}"
                   sleep 3
                 done
 
@@ -294,7 +338,7 @@ in {
                 source <(grep ZITI_PWD= /var/lib/ziti-controller/${zitiNetwork}.env)
 
                 ziti edge login \
-                  "${zitiEdgeController}:1280" \
+                  "${zitiEdgeController}:${toString cfg.portRestApi}" \
                   -u "$ZITI_USER" \
                   -p "$ZITI_PWD" \
                   -c /var/lib/ziti-router/pki/${zitiExternalHostname}-intermediate/certs/${zitiExternalHostname}-intermediate.cert
