@@ -3,7 +3,12 @@ pkgs: let
 in {
   state = {
     srcZiti = rec {
-      latest = let l = v0-26-10; in {inherit (l) version hash;};
+      latest = let l = v0-27-2; in {inherit (l) version hash;};
+
+      v0-27-2 = {
+        version = "0.27.2";
+        hash = "sha256-3Fo2PoyibmT/pSALIN6gM4kSSv8kKgTzeNKa/vGI5gc=";
+      };
 
       v0-26-10 = {
         version = "0.26.10";
@@ -22,7 +27,12 @@ in {
     };
 
     srcBinZiti = rec {
-      latest = let l = v0-26-10; in {inherit (l) version hash;};
+      latest = let l = v0-27-2; in {inherit (l) version hash;};
+
+      v0-27-2 = {
+        version = "0.27.2";
+        hash = "sha256-BsEsRuNEdMWrMTkokRHVrq9SjGsxw2aclrsVvxF595A=";
+      };
 
       v0-26-10 = {
         version = "0.26.10";
@@ -41,33 +51,28 @@ in {
     };
 
     srcBinZitiEdgeTunnel = rec {
-      latest = let l = v0-20-6; in {inherit (l) version hash;};
+      latest = let l = v0-20-18; in {inherit (l) version hash;};
+
+      v0-20-18 = {
+        version = "0.20.18";
+        hash = "sha256-D773ZeEs/NUp/lwVCKxYz5voq/MXeLiJU5YcB/Vcs8g=";
+      };
 
       v0-20-6 = {
         version = "0.20.6";
         hash = "sha256-fyOJJ88DvRCVHNtlWt1eUJdH1XRAyeSgHeJTwxWM8e0=";
       };
 
-      # Working
       v0-20-2 = {
         version = "0.20.2";
         hash = "sha256-ZgeVSGqy12CQJEErzQ1gaXtJbv5bVncH66Li1X8D3P0=";
       };
 
-      # False positive matches
-      # Artifacts not yet available
-      # v0-20-1 = {
-      #   version = "0.20.1";
-      #   hash = fakeSha256;
-      # };
-
-      # Broken DNS resolution
       v0-20-0 = {
         version = "0.20.0";
         hash = "sha256-/AS8PUaBjfunEwXvWnVmwMQSdQ0CHYM+FpbCSploaeA=";
       };
 
-      # Working without obvious issues for vpn service
       v0-19-11 = {
         version = "0.19.11";
         hash = "sha256-cZne4M7XZV+bpOq5moRexMqhKCkBQ8pMpa7A7oBOcX8=";
