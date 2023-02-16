@@ -3,7 +3,12 @@ pkgs: let
 in {
   state = {
     srcZiti = rec {
-      latest = let l = v0-27-2; in {inherit (l) version hash;};
+      latest = let l = v0-27-5; in {inherit (l) version hash;};
+
+      v0-27-5 = {
+        version = "0.27.5";
+        hash = "sha256-C9wVfmjb8nE10Zlfa0MJduUy86L9CEIPMDsJx7MwAwk=";
+      };
 
       v0-27-2 = {
         version = "0.27.2";
@@ -27,7 +32,12 @@ in {
     };
 
     srcBinZiti = rec {
-      latest = let l = v0-27-2; in {inherit (l) version hash;};
+      latest = let l = v0-27-5; in {inherit (l) version hash;};
+
+      v0-27-5 = {
+        version = "0.27.5";
+        hash = "sha256-bLOcK6Bh3J5dZ8+kudX/pxFaPVRP9GU0uHfO5xDBGiA=";
+      };
 
       v0-27-2 = {
         version = "0.27.2";
@@ -51,7 +61,12 @@ in {
     };
 
     srcBinZitiEdgeTunnel = rec {
-      latest = let l = v0-20-18; in {inherit (l) version hash;};
+      latest = let l = v0-20-20; in {inherit (l) version hash;};
+
+      v0-20-20 = {
+        version = "0.20.20";
+        hash = "sha256-dlFY+U7p1yfFhphlU1UZJek85K0QanYIi457U7dcGMM=";
+      };
 
       v0-20-18 = {
         version = "0.20.18";

@@ -113,11 +113,14 @@ in
 
     mkZitiConsole = inputs': self: {
       ziti-console = let
-        napalmPackage = inputs'.napalm.legacyPackages.buildPackage self.inputs.zitiConsole.outPath {};
+        napalmPackage = inputs'.napalm.legacyPackages.buildPackage self.inputs.zitiConsole.outPath {
+          npmCommands = "npm install --no-audit --loglevel verbose --ignore-scripts --nodedir=${nodejs}/include/node";
+        };
       in
         stdenv.mkDerivation rec {
           name = napalmPackage.name;
           src = napalmPackage.outPath;
+
           installPhase = ''
             mkdir $out
             cp -a _napalm-install/* $out/

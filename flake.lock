@@ -72,15 +72,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1665003617,
-        "narHash": "sha256-EXkCo9uMi/aGybJ+fhJuCw9mZyyOg24C4d8HrJ/QyFA=",
+        "lastModified": 1676300157,
+        "narHash": "sha256-1HjRzfp6LOLfcj/HJHdVKWAkX9QRAouoh6AjzJiIerU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "a989aa4619162ff37bcbb8c2fb1e502658647fb2",
+        "rev": "545c7a31e5dedea4a6d372712a18e00ce097d462",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -115,11 +116,11 @@
     "zitiConsole": {
       "flake": false,
       "locked": {
-        "lastModified": 1674059097,
-        "narHash": "sha256-qvYLTYKTmlBaS51/OVONEzKXk6GD54AKxNZd3yxGxnY=",
+        "lastModified": 1675602946,
+        "narHash": "sha256-5k/h//YC8PBs4drJrYe3Efb30wN+uEK7GJyXq+Y2Yd0=",
         "owner": "openziti",
         "repo": "ziti-console",
-        "rev": "edc053a6f55530f76863b16e559cf7a95e2a88e7",
+        "rev": "a6525823cf5b7c16b04eceb3d0bf13891115fa71",
         "type": "github"
       },
       "original": {
