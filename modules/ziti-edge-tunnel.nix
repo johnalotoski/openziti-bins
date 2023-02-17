@@ -145,8 +145,8 @@ in {
                 --refresh ${escapeShellArg (toString cfg.refresh)} \
                 ${
                 if cfg.dnsUpstream == null
-                then "\\\n"
-                else "--dns-upstream ${escapeShellArg cfg.dnsUpstream} \\"
+                then ''\''
+                else ''--dns-upstream ${escapeShellArg cfg.dnsUpstream} \''
               }
                 --dns-ip-range ${escapeShellArg cfg.dnsIpRange}
             '';
