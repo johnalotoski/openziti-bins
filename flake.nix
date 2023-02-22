@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-darwin.url = "github:NixOS/nixpkgs/nixpkgs-22.11-darwin";
 
     flake-compat = {
       url = "github:edolstra/flake-compat";
@@ -25,6 +26,7 @@
   outputs = {
     self,
     nixpkgs,
+    nixpkgs-darwin,
     flake-compat,
     flake-parts,
     napalm,
@@ -75,6 +77,29 @@
         };
 
       flake = {
+        packages.x86_64-darwin.ziti-edge-tunnel_latest = with nixpkgs-darwin.legacyPackages.x86_64-darwin; stdenv.mkDerivation rec {
+          version = "0.20.20";
+          name = "ziti-edge-tunnel_${version}";
+
+          src = fetchzip {
+            sha256 = "sha256-6CU3U2wuQNTaOBVDHIVbXgg1dtRJ65lrHqDewVkQTBk=";
+            url = "https://github.com/openziti/ziti-tunnel-sdk-c/releases/download/v${version}/ziti-edge-tunnel-Darwin_x86_64.zip";
+          };
+
+          sourceRoot = ".";
+
+          installPhase = ''
+            install -m755 -D source/ziti-edge-tunnel $out/bin/ziti-edge-tunnel
+          '';
+
+          meta = {
+            homepage = "https://github.com/openziti/ziti-tunnel-sdk-c";
+            description = "Ziti: programmable network overlay and associated edge components for application-embedded, zero-trust networking";
+            license = lib.licenses.asl20;
+            platforms = ["x86_64-darwin"];
+          };
+        };
+
         # darwinModules;
         nixosModules = {
           ziti-controller = import ./modules/ziti-controller.nix self;
