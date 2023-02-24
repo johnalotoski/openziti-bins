@@ -100,6 +100,27 @@
           };
         };
 
+        packages.aarch64-darwin.ziti-edge-tunnel_latest = with nixpkgs-darwin.legacyPackages.aarch64-darwin; stdenv.mkDerivation rec {
+          version = "unstable";
+          name = "ziti-edge-tunnel_${version}";
+
+          buildInputs = [unzip];
+          src = ./zip/ziti-edge-tunnel-Darwin_arm64.zip;
+
+          sourceRoot = ".";
+
+          installPhase = ''
+            install -m755 -D ziti-edge-tunnel $out/bin/ziti-edge-tunnel
+          '';
+
+          meta = {
+            homepage = "https://github.com/openziti/ziti-tunnel-sdk-c";
+            description = "Ziti: programmable network overlay and associated edge components for application-embedded, zero-trust networking";
+            license = lib.licenses.asl20;
+            platforms = ["aarch64-darwin"];
+          };
+        };
+
         # darwinModules;
         nixosModules = {
           ziti-controller = import ./modules/ziti-controller.nix self;
