@@ -133,11 +133,11 @@
     "zitiConsole": {
       "flake": false,
       "locked": {
-        "lastModified": 1675602946,
-        "narHash": "sha256-5k/h//YC8PBs4drJrYe3Efb30wN+uEK7GJyXq+Y2Yd0=",
+        "lastModified": 1677772886,
+        "narHash": "sha256-ft606tXgwQQ/0wuDzUnMjyXwehUfQkHdu9N8VGWV4Do=",
         "owner": "openziti",
         "repo": "ziti-console",
-        "rev": "a6525823cf5b7c16b04eceb3d0bf13891115fa71",
+        "rev": "1440a0fcb7034621215d11f1d8bcec1835f60b6f",
         "type": "github"
       },
       "original": {

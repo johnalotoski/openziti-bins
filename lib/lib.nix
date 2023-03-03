@@ -17,13 +17,24 @@ in
         url = "https://github.com/openziti/ziti/releases/download/v${version}/ziti-linux-amd64-${version}.tar.gz";
       };
 
-    srcBinZitiEdgeTunnel = version: sha256:
-      fetchzip {
+    srcBinZitiEdgeTunnel = version: sha256: {
+      x86_64-linux = fetchzip {
         inherit sha256;
         url = "https://github.com/openziti/ziti-tunnel-sdk-c/releases/download/v${version}/ziti-edge-tunnel-Linux_x86_64.zip";
       };
 
-    mkZitiPkg = v: state: {
+      x86_64-darwin = fetchzip {
+        inherit sha256;
+        url = "https://github.com/openziti/ziti-tunnel-sdk-c/releases/download/v${version}/ziti-edge-tunnel-Darwin_x86_64.zip";
+      };
+
+      aarch64-darwin = fetchzip {
+        inherit sha256;
+        url = "https://github.com/openziti/ziti-tunnel-sdk-c/releases/download/v${version}/ziti-edge-tunnel-Darwin_arm64.zip";
+      };
+    };
+
+    mkZitiPkg = v: state: lib.optionalAttrs (system == "x86_64-linux") {
       "ziti_${v}" = stdenv.mkDerivation rec {
         inherit (state.srcBinZiti.${v}) version;
         name = "ziti_${version}";
@@ -57,7 +68,7 @@ in
       };
     };
 
-    mkZitiBinTypePkg = v: binType: state: {
+    mkZitiBinTypePkg = v: binType: state: lib.optionalAttrs (system == "x86_64-linux") {
       "ziti-${binType}_${v}" = stdenv.mkDerivation rec {
         inherit (state.srcBinZiti.${v}) version;
         name = "ziti-${binType}_${version}";
@@ -80,7 +91,7 @@ in
       };
     };
 
-    mkZitiCliFnPkg = v: state: {
+    mkZitiCliFnPkg = v: state: lib.optionalAttrs (system == "x86_64-linux") {
       "ziti-cli-functions_${v}" = writeShellApplication {
         runtimeInputs = [coreutils curl hostname jq killall openssl];
         name = "ziti-cli-functions.sh";
@@ -111,7 +122,7 @@ in
       };
     };
 
-    mkZitiConsole = inputs': self: {
+    mkZitiConsole = inputs': self: lib.optionalAttrs (system == "x86_64-linux") {
       ziti-console = let
         napalmPackage = inputs'.napalm.legacyPackages.buildPackage self.inputs.zitiConsole.outPath {
           npmCommands = "npm install --no-audit --loglevel verbose --ignore-scripts --nodedir=${nodejs}/include/node";
@@ -133,15 +144,15 @@ in
         };
     };
 
-    mkZitiEdgeTunnelPkg = v: state: {
+    mkZitiEdgeTunnelPkg = v: state: system: {
       "ziti-edge-tunnel_${v}" = stdenv.mkDerivation rec {
-        inherit (state.srcBinZitiEdgeTunnel.${v}) version;
+        inherit (state.srcBinZitiEdgeTunnel.${system}.${v}) version;
         name = "ziti-edge-tunnel_${version}";
 
-        src = srcBinZitiEdgeTunnel version state.srcBinZitiEdgeTunnel.${v}.hash;
+        src = (srcBinZitiEdgeTunnel version state.srcBinZitiEdgeTunnel.${system}.${v}.hash).${system};
         sourceRoot = ".";
-        nativeBuildInputs = [autoPatchelfHook];
-        runtimeDependencies = [systemd];
+        nativeBuildInputs = lib.optionals (system == "x86_64-linux") [autoPatchelfHook];
+        runtimeDependencies = lib.optionals (system == "x86_64-linux") [systemd];
 
         installPhase = ''
           install -m755 -D source/ziti-edge-tunnel $out/bin/ziti-edge-tunnel
@@ -151,7 +162,7 @@ in
           homepage = "https://github.com/openziti/ziti-tunnel-sdk-c";
           description = "Ziti: programmable network overlay and associated edge components for application-embedded, zero-trust networking";
           license = licenses.asl20;
-          platforms = platforms.linux;
+          platforms = ["x86_64-linux" "x86_64-darwin" "aarch64-darwin"];
         };
       };
     };
@@ -159,5 +170,5 @@ in
     mkZitiPkgs = state: foldl (acc: v: acc // (mkZitiPkg v state)) {} (attrNames state.srcBinZiti);
     mkZitiBinTypePkgs = state: binType: foldl (acc: v: acc // (mkZitiBinTypePkg v binType state)) {} (attrNames state.srcZiti);
     mkZitiCliFnPkgs = state: foldl (acc: v: acc // (mkZitiCliFnPkg v state)) {} (attrNames state.srcZiti);
-    mkZitiEdgeTunnelPkgs = state: foldl (acc: v: acc // (mkZitiEdgeTunnelPkg v state)) {} (attrNames state.srcBinZitiEdgeTunnel);
+    mkZitiEdgeTunnelPkgs = state: system: foldl (acc: v: acc // (mkZitiEdgeTunnelPkg v state system)) {} (attrNames state.srcBinZitiEdgeTunnel.${system});
   }
