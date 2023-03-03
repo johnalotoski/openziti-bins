@@ -76,9 +76,16 @@ in {
             name = "ziti-console-preScript.sh";
             text = ''
               if ! [ -f .bootstrap-pre-complete ]; then
+                echo "Creating ziti-console files and directories prior to startup..."
                 cp -a ${ziti-console}/* /var/lib/ziti-console
-
-                touch .bootstrap-pre-complete
+                echo ${ziti-console} > .bootstrap-pre-complete
+              else
+                if [ "$(cat .bootstrap-pre-complete)" != "${ziti-console}" ]; then
+                  echo "Replacing ziti-console files and directories prior to startup with an update..."
+                  rm -rf /var/lib/ziti-console/*
+                  cp -a ${ziti-console}/* /var/lib/ziti-console
+                  echo ${ziti-console} > .bootstrap-pre-complete
+                fi
               fi
 
               until [ -f "$ZAC_SERVER_CERT_CHAIN" ]; do

@@ -3,7 +3,7 @@ pkgs: let
 in {
   state = {
     srcZiti = rec {
-      latest = let l = v0-27-5; in {inherit (l) version hash;};
+      latest = v0-27-5;
 
       v0-27-5 = {
         version = "0.27.5";
@@ -32,7 +32,7 @@ in {
     };
 
     srcBinZiti = rec {
-      latest = let l = v0-27-5; in {inherit (l) version hash;};
+      latest = v0-27-5;
 
       v0-27-5 = {
         version = "0.27.5";
@@ -60,37 +60,64 @@ in {
       };
     };
 
-    srcBinZitiEdgeTunnel = rec {
-      latest = let l = v0-20-20; in {inherit (l) version hash;};
+    srcBinZitiEdgeTunnel = let
+    in rec {
 
-      v0-20-20 = {
-        version = "0.20.20";
-        hash = "sha256-dlFY+U7p1yfFhphlU1UZJek85K0QanYIi457U7dcGMM=";
+      x86_64-linux = rec {
+        latest = v0-20-21;
+
+        v0-20-21 = {
+          version = "0.20.21";
+          hash = "sha256-8/ci7ULITRcRpHnZcr7afcOt+y6aLfxeaRdJHN0Ma1U=";
+        };
+
+        v0-20-20 = {
+          version = "0.20.20";
+          hash = "sha256-dlFY+U7p1yfFhphlU1UZJek85K0QanYIi457U7dcGMM=";
+        };
+
+        v0-20-18 = {
+          version = "0.20.18";
+          hash = "sha256-D773ZeEs/NUp/lwVCKxYz5voq/MXeLiJU5YcB/Vcs8g=";
+        };
+
+        v0-20-6 = {
+          version = "0.20.6";
+          hash = "sha256-fyOJJ88DvRCVHNtlWt1eUJdH1XRAyeSgHeJTwxWM8e0=";
+        };
+
+        v0-20-2 = {
+          version = "0.20.2";
+          hash = "sha256-ZgeVSGqy12CQJEErzQ1gaXtJbv5bVncH66Li1X8D3P0=";
+        };
+
+        v0-20-0 = {
+          version = "0.20.0";
+          hash = "sha256-/AS8PUaBjfunEwXvWnVmwMQSdQ0CHYM+FpbCSploaeA=";
+        };
+
+        v0-19-11 = {
+          version = "0.19.11";
+          hash = "sha256-cZne4M7XZV+bpOq5moRexMqhKCkBQ8pMpa7A7oBOcX8=";
+        };
       };
 
-      v0-20-18 = {
-        version = "0.20.18";
-        hash = "sha256-D773ZeEs/NUp/lwVCKxYz5voq/MXeLiJU5YcB/Vcs8g=";
+      x86_64-darwin = rec {
+        latest = v0-20-21;
+
+        v0-20-21 = {
+          version = "0.20.21";
+          hash = "sha256-HpnhiDSM3grranJ7gt3HM8Zfn4BBBTxQjnFy8ASsiFw=";
+        };
       };
 
-      v0-20-6 = {
-        version = "0.20.6";
-        hash = "sha256-fyOJJ88DvRCVHNtlWt1eUJdH1XRAyeSgHeJTwxWM8e0=";
-      };
+      aarch64-darwin = rec {
+        latest = v0-20-21;
 
-      v0-20-2 = {
-        version = "0.20.2";
-        hash = "sha256-ZgeVSGqy12CQJEErzQ1gaXtJbv5bVncH66Li1X8D3P0=";
-      };
-
-      v0-20-0 = {
-        version = "0.20.0";
-        hash = "sha256-/AS8PUaBjfunEwXvWnVmwMQSdQ0CHYM+FpbCSploaeA=";
-      };
-
-      v0-19-11 = {
-        version = "0.19.11";
-        hash = "sha256-cZne4M7XZV+bpOq5moRexMqhKCkBQ8pMpa7A7oBOcX8=";
+        v0-20-21 = {
+          version = "0.20.21";
+          hash = "sha256-UwD91Hx4c95JT3rGc4WxnNQbpNP8xq6an7m31VB/9CM=";
+        };
       };
     };
   };

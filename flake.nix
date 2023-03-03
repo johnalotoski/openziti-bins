@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-darwin.url = "github:NixOS/nixpkgs/nixpkgs-22.11-darwin";
 
     flake-compat = {
       url = "github:edolstra/flake-compat";
@@ -25,13 +26,18 @@
   outputs = {
     self,
     nixpkgs,
+    nixpkgs-darwin,
     flake-compat,
     flake-parts,
     napalm,
     zitiConsole,
   }:
     flake-parts.lib.mkFlake {inherit self;} {
-      systems = ["x86_64-linux"];
+      systems = [
+        "x86_64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
       perSystem = {
         inputs',
         pkgs,
@@ -69,13 +75,12 @@
               (recursiveUpdate (mkZitiBinTypePkgs state "tunnel"))
               (recursiveUpdate (mkZitiCliFnPkgs state))
               (recursiveUpdate (mkZitiConsole inputs' self))
-              (recursiveUpdate (mkZitiEdgeTunnelPkgs state))
+              (recursiveUpdate (mkZitiEdgeTunnelPkgs state system))
               (recursiveUpdate {default = packages.ziti-edge-tunnel_latest;})
             ];
         };
 
       flake = {
-        # darwinModules;
         nixosModules = {
           ziti-controller = import ./modules/ziti-controller.nix self;
           ziti-console = import ./modules/ziti-console.nix self;
