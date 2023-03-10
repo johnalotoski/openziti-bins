@@ -64,7 +64,12 @@ in {
     in rec {
 
       x86_64-linux = rec {
-        latest = v0-20-21;
+        latest = v0-20-22;
+
+        v0-20-22 = {
+          version = "0.20.22";
+          hash = "sha256-ji29IzPLrM5Qh1Tg+WTn5z222267aks7qVICQOQi22A=";
+        };
 
         v0-20-21 = {
           version = "0.20.21";
@@ -103,7 +108,12 @@ in {
       };
 
       x86_64-darwin = rec {
-        latest = v0-20-21;
+        latest = v0-20-22;
+
+        v0-20-22 = {
+          version = "0.20.22";
+          hash = "sha256-bYif71NfMgajWXjDyRB9FQOOjliUmt0qNvO6C3g1lfM=";
+        };
 
         v0-20-21 = {
           version = "0.20.21";
@@ -112,7 +122,12 @@ in {
       };
 
       aarch64-darwin = rec {
-        latest = v0-20-21;
+        latest = v0-20-22;
+
+        v0-20-22 = {
+          version = "0.20.22";
+          hash = "sha256-u+lsg2znaJTinR9/WUfUVP8YS7QkWo4d4Du9Fj79iaE=";
+        };
 
         v0-20-21 = {
           version = "0.20.21";
