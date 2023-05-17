@@ -77,6 +77,30 @@
               (recursiveUpdate (mkZitiConsole inputs' self))
               (recursiveUpdate (mkZitiEdgeTunnelPkgs state system))
               (recursiveUpdate {default = packages.ziti-edge-tunnel_latest;})
+              (recursiveUpdate {
+                ziti-edge-tunnel_latest_large_tcp = stdenv.mkDerivation rec {
+                  version = "unstable";
+                  name = "ziti-edge-tunnel_latest_large_tcp";
+
+                  nativeBuildInputs = lib.optionals (system == "x86_64-linux") [autoPatchelfHook];
+                  runtimeDependencies = lib.optionals (system == "x86_64-linux") [systemd];
+                  buildInputs = [unzip];
+                  src = ./zip/ziti-edge-tunnel-Linux_x86_64.zip;
+
+                  sourceRoot = ".";
+
+                  installPhase = ''
+                    install -m755 -D ziti-edge-tunnel $out/bin/ziti-edge-tunnel
+                  '';
+
+                  meta = {
+                    homepage = "https://github.com/openziti/ziti-tunnel-sdk-c";
+                    description = "Ziti: programmable network overlay and associated edge components for application-embedded, zero-trust networking";
+                    license = lib.licenses.asl20;
+                    platforms = ["x86_64-linux"];
+                  };
+                };
+              })
             ];
         };
 
