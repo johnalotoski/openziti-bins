@@ -5,7 +5,7 @@ self: {
   ...
 }: let
   inherit (lib) escapeShellArg mkIf mkOption;
-  inherit (lib.types) bool ints nullOr package str;
+  inherit (lib.types) bool enum ints nullOr package str;
 
   cfg = config.services.ziti-edge-tunnel;
   ziti-edge-tunnel = cfg.package;
@@ -82,6 +82,14 @@ in {
       '';
     };
 
+    user = mkOption {
+      type = enum ["root" "ziti"];
+      default = "ziti";
+      description = ''
+        The default user to run as.
+      '';
+    };
+
     verbosity = mkOption {
       type = ints.positive;
       default = 3;
@@ -99,6 +107,23 @@ in {
 
     services.resolved.enable = cfg.enableResolved;
 
+    users.users.ziti.isSystemUser = true;
+    users.users.ziti.group = "ziti";
+    users.groups.ziti = {};
+
+    # Permit ziti-edge-tunnel to configure link DNS as ziti user
+    security.polkit = mkIf (cfg.user == "ziti") {
+      enable = lib.mkForce true;
+      extraConfig = ''
+        polkit.addRule(function(action, subject) {
+        if (action.id.indexOf("org.freedesktop.resolve1.") == 0 &&
+        subject.user == "ziti") {
+        return polkit.Result.YES;
+        }
+        });
+      '';
+    };
+
     systemd.services.ziti-edge-tunnel = {
       wantedBy = ["multi-user.target"];
 
@@ -108,6 +133,9 @@ in {
       path = with pkgs; [bash coreutils fd gnugrep gnused iproute2 ziti-edge-tunnel];
 
       serviceConfig = {
+        User = mkIf (cfg.user == "ziti") cfg.user;
+        UMask = mkIf (cfg.user == "ziti") "0007";
+        AmbientCapabilities = mkIf (cfg.user == "ziti") "CAP_NET_ADMIN";
         Restart = "always";
         RestartSec = 5;
         StateDirectory = "ziti";
